@@ -7,6 +7,7 @@ namespace TankAttack
 {
     class GreenPlayer : Player
     {
+        bool spaceWasReleased = true;
         public GreenPlayer(
             Game game, 
             Vector2 startPosition, 
@@ -23,40 +24,39 @@ namespace TankAttack
         public override void Initialize()
         {
             topHud.Location = new Vector2(10, 10);
+            base.Initialize();
         }
 
         public override void Interact(KeyboardState keyState)
         {
+            base.Interact(keyState);
             if (keyState.IsKeyDown(Keys.Q))
-            TurretRotation -= Globals.TurretRotationSpeed;
+                { TurretRotate(false); }
 
             if (keyState.IsKeyDown(Keys.E))
-                TurretRotation += Globals.TurretRotationSpeed;
+                { TurretRotate(true); }
 
             if (keyState.IsKeyDown(Keys.D))
-                HullRotation += Globals.RotationSpeed;
+                { HullRotate(true); }
 
             if (keyState.IsKeyDown(Keys.A))
-                HullRotation -= Globals.RotationSpeed;
+                { HullRotate(false); }
 
             if (keyState.IsKeyDown(Keys.W))
-            {
-                Accelerate();
-                Position = Speed;
-            }
+                { Accelerate(); }
 
             if (keyState.IsKeyDown(Keys.S))
-            {
-                Decelerate();
-                Position = Speed;
-            }
+                { Reverse(); }
 
-            if (keyState.IsKeyDown(Keys.Space))
+            // One shot per press
+            if (keyState.IsKeyUp(Keys.Space)) { spaceWasReleased = true; }
+            if (keyState.IsKeyDown(Keys.Space) && spaceWasReleased)
             {
                 if (FireCooldown == 0) 
                 {
                     weaponSystem.Fire(this);
                 }
+                spaceWasReleased = false;
             }   
         }
     }

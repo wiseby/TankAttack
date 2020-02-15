@@ -7,6 +7,7 @@ namespace TankAttack
 {
     class BrownPlayer : Player
     {
+        bool enterWasReleased = true;
         public BrownPlayer(
             Game game, 
             Vector2 startPosition, 
@@ -22,37 +23,44 @@ namespace TankAttack
         public override void Initialize()
         {
             topHud.Location = new Vector2(Globals.ScreenWidth / 2 + 10, 20);
+            base.Initialize();
         }
+
+        
 
         public override void Interact(KeyboardState keyState)
         {
             if (keyState.IsKeyDown(Keys.NumPad4))
-                TurretRotation -= Globals.TurretRotationSpeed;
+                { TurretRotate(false); }
 
             if (keyState.IsKeyDown(Keys.NumPad6))
-                TurretRotation += Globals.TurretRotationSpeed;
+                { TurretRotate(true); }
 
             if (keyState.IsKeyDown(Keys.Right))
-                HullRotation += Globals.RotationSpeed;
+                { HullRotate(true); }
 
             if (keyState.IsKeyDown(Keys.Left))
-                HullRotation -= Globals.RotationSpeed;
+                { HullRotate(false); }
 
             if (keyState.IsKeyDown(Keys.Up))
             {
                 Accelerate();
-                Position = Speed;
             }
 
             if (keyState.IsKeyDown(Keys.Down))
             {
-                Decelerate();
-                Position = Speed;
+                Reverse();
             }
 
-            if (keyState.IsKeyDown(Keys.Enter))
+            // One shot per press
+            if (keyState.IsKeyUp(Keys.Enter)) { enterWasReleased = true; }
+            if (keyState.IsKeyDown(Keys.Enter) && enterWasReleased)
             {
-                weaponSystem.Fire(this);
+                if (FireCooldown == 0)
+                {
+                    weaponSystem.Fire(this);
+                }
+                enterWasReleased = false;
             }   
         }
     }

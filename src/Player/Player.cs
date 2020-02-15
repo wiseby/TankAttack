@@ -6,8 +6,15 @@ using System.Collections.Generic;
 
 namespace TankAttack
 {
-    class Player : DrawableGameComponent, IGameObject
+    class Player : DrawableGameComponent, IGameObject, IMovableComponent
     {
+        public bool IsReversing { get; set; }
+        public bool IsAccelerating { get; set; }
+        public bool CanRotate { get; set; }
+        public bool CanAccelerate { get; set; }
+        public bool CanReverse { get; set; }
+        public bool GotHit { get; set; }
+        public bool Collided { get; set; }
         public bool IsDead { get; set; }
         public Vector2 Position { get; set; }
         public Vector2 Speed { get; set; }
@@ -16,6 +23,7 @@ namespace TankAttack
         public float TurretRotation { get; set; }
         public float Rotation { get; set; }
         public Vector2 BarrelTip { get; set; }
+        public int Health { get; set; }
 
         // Collision
         public Rectangle CollisionBox
@@ -23,6 +31,14 @@ namespace TankAttack
             get
             {
                 return new Rectangle((int)Position.X, (int)Position.Y, TankHullTexture.Width, TankHullTexture.Height);
+            }
+        }
+
+        public Circle CollisionCircle
+        {
+            get
+            {
+                return new Circle((int)Position.X, (int)Position.Y, TankHullTexture.Height / 2 - 5);
             }
         }
 
@@ -53,10 +69,6 @@ namespace TankAttack
         {
             Position = startPosition;
             Speed = Position;
-            Rotation = 90;
-            IsFiring = false;
-            FireCooldown = 0;
-            PreviousTime = 0.0f;
 
             topHud = new TopHUD(game, spriteFonts);
             topHud.NameText = this.GetType().Name;
@@ -64,16 +76,32 @@ namespace TankAttack
             Textures = textures;
 
             weaponSystem = new WeaponSystem(game, this);
+            Initialize();
         }
         /* #endregion */
 
+        public override void Initialize()
+        {
+            CanReverse = true;
+            CanAccelerate = true;
+            Rotation = 90;
+            IsFiring = false;
+            FireCooldown = 0;
+            PreviousTime = 0.0f;
+            Health = 100;
+            base.Initialize();
+        }
+
         public virtual void Interact(KeyboardState keyState)
         {
-
+            // IsReversing = false;
+            // IsAccelerating = false;
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            weaponSystem.Draw(spriteBatch);
+            
             spriteBatch.Draw(
                 TankHullTexture,
                 Position,
@@ -100,7 +128,6 @@ namespace TankAttack
                 SpriteEffects.None,
                 0f);
 
-            weaponSystem.Draw(spriteBatch);
             topHud.Draw(spriteBatch);
         }
 
@@ -126,25 +153,59 @@ namespace TankAttack
                 PreviousTime = CurrentTime;
             }
 
-            BarrelTip = Position + new Vector2((float)Math.Cos(HullRotation),
-                (float)Math.Sin(HullRotation));
+            Vector2 BarrelOffset = new Vector2((float)Math.Cos(TurretRotation), (float)Math.Sin(TurretRotation)) * 32;
+            BarrelTip = Position + BarrelOffset;
 
             weaponSystem.Update();
 
-            TankAttack.debugWindow.Output.Add(
-                $"{this.GetType().Name} Projectiles: {weaponSystem.GetTotalNumberOfProjectiles()}");
+            // TankAttack.debugWindow.Output.Add(
+            //     $"{this.GetType().Name} Projectiles: {weaponSystem.GetTotalNumberOfProjectiles()}");
+
+            if (Collided == true && IsAccelerating == true)
+            { 
+                CanAccelerate = false; 
+                TankAttack.debugWindow.Output.Add($"{this.GetType().Name}Cant Accelerate!");
+            }
+
+            else if (Collided == true && IsReversing == true) 
+            {
+                CanReverse = false; 
+                TankAttack.debugWindow.Output.Add($"{this.GetType().Name}Cant Reverse!");
+            }
+            else if (Collided == false)
+            {
+                CanReverse = true;
+                CanAccelerate = true;
+            }
+            Collided = false;
+
+            if (GotHit) { Health -= 10; }
+
+            if (Health <= 0) { IsDead = true; }
+            GotHit = false;
+            
         }
 
         public void Accelerate()
         {
-            Speed += new Vector2((float)Math.Cos(HullRotation),
-                (float)Math.Sin(HullRotation)) * Globals.TankSpeed;
+            if (CanAccelerate)
+            {
+                Speed += new Vector2((float)Math.Cos(HullRotation),
+                    (float)Math.Sin(HullRotation)) * Globals.TankSpeed;
+                Position = Speed;
+                IsAccelerating = true;
+            }
         }
 
-        public void Decelerate()
+        public void Reverse()
         {
-            Speed -= new Vector2((float)Math.Cos(HullRotation),
-                (float)Math.Sin(HullRotation)) * Globals.TankSpeed;
+            if(CanReverse)
+            {
+                Speed -= new Vector2((float)Math.Cos(HullRotation),
+                    (float)Math.Sin(HullRotation)) * Globals.TankSpeed;
+                Position = Speed;
+                IsReversing = true;
+            }
         }
 
         public bool IsColliding(Rectangle componentRect)
@@ -154,6 +215,18 @@ namespace TankAttack
                 return true;
             }
             return false;
+        }
+
+        public void HullRotate(bool clockWise)
+        {
+            if (clockWise) { HullRotation += Globals.RotationSpeed; }
+            else { HullRotation -= Globals.RotationSpeed; }
+        }
+
+        public void TurretRotate(bool clockWise)
+        { 
+            if (clockWise) { TurretRotation += Globals.TurretRotationSpeed; }
+            else { TurretRotation -= Globals.TurretRotationSpeed; }
         }
     }
 }

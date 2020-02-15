@@ -50,11 +50,18 @@ namespace TankAttack
             for (int i = projectiles.Count -1; i >= 0; i--)
             {
                 if (ProjectileOutOfFrame(projectiles[i]))
-                { RemoveProjectile(projectiles[i]); }
+                { 
+                    RemoveProjectile(projectiles[i]); 
+                }
+
+                else if (projectiles[i].GotHit)
+                {
+                    projectiles[i].Explode();
+                    RemoveProjectile(projectiles[i]);
+                }
 
                 else { projectiles[i].Update(); }
             }
-            // FIXME Debugging
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -69,7 +76,7 @@ namespace TankAttack
         {
 
             var projectile = new Projectile(
-                Game, player.Position, player.TurretRotation, ProjectileTexture);
+                Game, player.BarrelTip, player.TurretRotation, ProjectileTexture);
             projectiles.Add(projectile);
             TankAttack.gameComponents.Add(projectile);
         }
@@ -78,6 +85,7 @@ namespace TankAttack
         public void RemoveProjectile(Projectile projectile)
         {
             projectiles.Remove(projectile);
+            TankAttack.gameComponents.Remove(projectile);
         }
 
         public bool ProjectileOutOfFrame(Projectile projectile)

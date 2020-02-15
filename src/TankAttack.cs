@@ -13,11 +13,16 @@ namespace TankAttack
         SpriteBatch spriteBatch;
         List<Player> players;
         KeyboardState previousKbState;
-        public static List<IGameComponent> gameComponents;
+        public static List<IGameObject> gameComponents;
 
         private Texture2D groundDessertTexture;
         private Dictionary<string, Texture2D> textures;
         private Dictionary<string, SpriteFont> fonts;
+
+        // Collisions control
+        private Collision collision;
+
+        private bool gameOver;
 
         public static DebugWindow debugWindow;
 
@@ -46,7 +51,9 @@ namespace TankAttack
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferHeight = Globals.ScreenHeight;
             graphics.PreferredBackBufferWidth = Globals.ScreenWidth;
-            graphics.IsFullScreen = true;
+
+            // Run in window mode when debugging!!!
+            graphics.IsFullScreen = false;
             textures = new Dictionary<string, Texture2D>();
             fonts = new Dictionary<string, SpriteFont>();
 
@@ -57,7 +64,7 @@ namespace TankAttack
         {
             Window.Title = "Tank Attack!";
             players = new List<Player>();
-            gameComponents = new List<IGameComponent>();
+            gameComponents = new List<IGameObject>();
 
             base.Initialize();
 
@@ -65,6 +72,11 @@ namespace TankAttack
             AddPlayer(new BrownPlayer(this, new Vector2(Globals.ScreenWidth - 200, Globals.ScreenHeight / 2), textures, fonts));
 
             debugWindow = new DebugWindow(this, true, fonts, textures);
+
+            // Create a Collision Instance
+            collision = new Collision();
+
+            // Create terrain, map etc...
         }
 
         private void AddPlayer(Player player)
@@ -92,7 +104,8 @@ namespace TankAttack
         
         protected override void Update(GameTime gameTime)
         {
-            debugWindow.Output.Clear();
+            if (debugWindow.Output.Count > 15)
+                { debugWindow.Output.Clear(); }
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back ==
                 ButtonState.Pressed || Keyboard.GetState().IsKeyDown(
                     Keys.Escape))
@@ -100,16 +113,20 @@ namespace TankAttack
             
             KeyboardState keyState = Keyboard.GetState();
 
+            collision.CheckColliders(gameComponents, gameTime);
+
             // For every player (wich is 2 at the moment) 
             // make movement for each of them.
             foreach(var player in players)
             {
                 player.Interact(keyState);
                 player.Update(gameTime);
+                if (player.IsDead) { gameOver = true; }
             }
             previousKbState = keyState;
             
             base.Update(gameTime);
+            if (gameOver) { Exit(); }
         }
 
         /// <summary>

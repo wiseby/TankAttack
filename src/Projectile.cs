@@ -6,6 +6,13 @@ namespace TankAttack
 {
     class Projectile : DrawableGameComponent, IGameObject
     {
+        private bool gotHit = false;
+        public bool GotHit {
+            set { gotHit = value; }
+            get { return gotHit; }
+        }
+        public bool Collided { get; set; }
+
         public bool IsDead { get; set; }
         public Vector2 Speed { get; set; }
         public Vector2 Position { get; set; }
@@ -22,6 +29,14 @@ namespace TankAttack
                 return new Rectangle((int)Position.X, (int)Position.Y, ProjectileTexture.Width, ProjectileTexture.Height);        
             } 
         } 
+
+        public Circle CollisionCircle
+        {
+            get 
+            {
+                return new Circle((int)Position.X, (int)Position.Y, ProjectileTexture.Height / 2);
+            }
+        }
 
         public Projectile(
             Game game, Vector2 startPosition, float startRotation, Texture2D projectileTexture) 
@@ -49,8 +64,14 @@ namespace TankAttack
                 );
         }
 
-        public void Update()
+        internal void Explode()
         {
+            // Write out explosion sprite
+
+        }
+
+        public void Update()
+        {   
             Position = Speed;
             Accelerate();
         }
@@ -59,15 +80,6 @@ namespace TankAttack
         {
             Speed += new Vector2((float)Math.Cos(Rotation),
                 (float)Math.Sin(Rotation)) * Globals.ProjectileSpeed;
-        }
-
-        public bool IsColliding(Rectangle componentRect)
-        {
-            if (componentRect.Intersects(this.CollisionBox))
-            {
-                return true;
-            }
-            return false;
-        }        
+        }    
     }
 }

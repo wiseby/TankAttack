@@ -1,9 +1,13 @@
-﻿namespace TankAttack
+﻿using System;
+
+namespace TankAttack
 {
     class Globals
     {
         public static int ScreenWidth = 1920;
         public static int ScreenHeight = 1080;
+
+        public static TimeSpan CollisionCheckInterval = new TimeSpan(0, 0, 0, 0, 100);
 
         public static float RotationSpeed = 0.07f;
         public static float TankSpeed = 3.0f;

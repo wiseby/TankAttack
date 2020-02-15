@@ -4,12 +4,13 @@ namespace TankAttack
 {
     public interface IGameObject
     {
-        bool IsDead { get; set; }
+        bool IsDead { set; }
+        bool GotHit { get; set; }
+        bool Collided { get; set; }
         Vector2 Position { get; set; }
         Vector2 Speed { get; set; }
         float Rotation { get; set; }
         Rectangle CollisionBox { get; }
-
-        bool IsColliding(Rectangle component);
+        Circle CollisionCircle { get; }
     }
 }
