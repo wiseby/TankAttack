@@ -29,7 +29,7 @@ namespace TankAttack
         public Vector2 Location { get; set; }
         public Rectangle HudRect { get; set; }
 
-        public TopHUD(Game game, Dictionary<string, SpriteFont> spriteFonts) : base(game)
+        public TopHUD(Game1 game, Dictionary<string, SpriteFont> spriteFonts) : base(game)
         {
             this.spriteFonts = spriteFonts;
             NameSpriteFont = this.spriteFonts["SpriteFonts/Name"];

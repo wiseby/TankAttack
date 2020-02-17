@@ -71,7 +71,7 @@ namespace TankAttack
         }
 
         public void Update()
-        {   
+        {
             Position = Speed;
             Accelerate();
         }

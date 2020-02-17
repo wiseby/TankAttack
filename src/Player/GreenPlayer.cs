@@ -9,7 +9,7 @@ namespace TankAttack
     {
         bool spaceWasReleased = true;
         public GreenPlayer(
-            Game game, 
+            Game1 game, 
             Vector2 startPosition, 
             Dictionary<string, 
             Texture2D> textures,

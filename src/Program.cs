@@ -13,7 +13,7 @@ namespace TankAttack
         [STAThread]
         static void Main()
         {
-            using (var game = new TankAttack())
+            using (var game = new Game1())
                 game.Run();
         }
     }

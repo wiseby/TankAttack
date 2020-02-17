@@ -61,7 +61,7 @@ namespace TankAttack
         /* #region  constructor */
 
         public Player(
-            Game game, 
+            Game1 game, 
             Vector2 startPosition, 
             Dictionary<string, Texture2D> textures,
             Dictionary<string, SpriteFont> spriteFonts) 
@@ -161,23 +161,20 @@ namespace TankAttack
             // TankAttack.debugWindow.Output.Add(
             //     $"{this.GetType().Name} Projectiles: {weaponSystem.GetTotalNumberOfProjectiles()}");
 
-            if (Collided == true && IsAccelerating == true)
+            if (Collided == true)
             { 
-                CanAccelerate = false; 
-                TankAttack.debugWindow.Output.Add($"{this.GetType().Name}Cant Accelerate!");
-            }
+                if (IsAccelerating)
+                {
+                    CanAccelerate = false; 
+                    Game1.debugWindow.Output.Add($"{this.GetType().Name}Cant Accelerate!");
+                }
 
-            else if (Collided == true && IsReversing == true) 
-            {
-                CanReverse = false; 
-                TankAttack.debugWindow.Output.Add($"{this.GetType().Name}Cant Reverse!");
+                if (IsReversing) 
+                {
+                    CanReverse = false; 
+                    Game1.debugWindow.Output.Add($"{this.GetType().Name}Cant Reverse!");
+                }
             }
-            else if (Collided == false)
-            {
-                CanReverse = true;
-                CanAccelerate = true;
-            }
-            Collided = false;
 
             if (GotHit) { Health -= 10; }
 

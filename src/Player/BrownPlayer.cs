@@ -9,7 +9,7 @@ namespace TankAttack
     {
         bool enterWasReleased = true;
         public BrownPlayer(
-            Game game, 
+            Game1 game, 
             Vector2 startPosition, 
             Dictionary<string, Texture2D> textures, 
             Dictionary<string, SpriteFont> spriteFonts ) 
@@ -23,6 +23,7 @@ namespace TankAttack
         public override void Initialize()
         {
             topHud.Location = new Vector2(Globals.ScreenWidth / 2 + 10, 20);
+            TurretRotation += 180;
             base.Initialize();
         }
 

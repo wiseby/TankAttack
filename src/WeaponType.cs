@@ -78,14 +78,14 @@ namespace TankAttack
             var projectile = new Projectile(
                 Game, player.BarrelTip, player.TurretRotation, ProjectileTexture);
             projectiles.Add(projectile);
-            TankAttack.gameComponents.Add(projectile);
+            Game1.GameComponents.Add(projectile);
         }
 
 
         public void RemoveProjectile(Projectile projectile)
         {
             projectiles.Remove(projectile);
-            TankAttack.gameComponents.Remove(projectile);
+            Game1.GameComponents.Remove(projectile);
         }
 
         public bool ProjectileOutOfFrame(Projectile projectile)

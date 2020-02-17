@@ -16,10 +16,10 @@ namespace TankAttack
         public int Width { get; set; }
         public int Height { get; set; }
 
-        private Vector2[] TopPoints;
-        private Vector2[] BottomPoints;
-        private Vector2[] RightPoints;
-        private Vector2[] LeftPoints;
+        // private Vector2[] TopPoints;
+        // private Vector2[] BottomPoints;
+        // private Vector2[] RightPoints;
+        // private Vector2[] LeftPoints;
 
         /// <summary>
         /// Creates a CollisionRectangle from the points given and size.

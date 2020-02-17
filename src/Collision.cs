@@ -53,16 +53,16 @@ namespace TankAttack
             if (colliderA is Projectile && colliderB is Projectile)
             {
                 // If both colliders are projectiles, destroy them.
-                colliderA.IsDead = true;
-                colliderB.IsDead = true;
-                TankAttack.debugWindow.Output.Add("Projectile Collision!!!");
+                colliderA.GotHit = true;
+                colliderB.GotHit = true;
+                Game1.debugWindow.Output.Add("Projectile Collision!!!");
 
             }
 
             if ((colliderA is Player && colliderB is Projectile) || (colliderA is Projectile && colliderB is Player))
             {
                 // If either one collider is projectiles and the other a player.
-                TankAttack.debugWindow.Output.Add("Player Hit!!!");
+                Game1.debugWindow.Output.Add("Player Hit!!!");
                 
                 // Player GotHit = true
                 colliderA.GotHit = true;
@@ -72,7 +72,7 @@ namespace TankAttack
             if (colliderA is Player && colliderB is Player)
             {
                 // If either one collider is projectiles and the other a player.
-                TankAttack.debugWindow.Output.Add("Player bumped Player!!!");
+                Game1.debugWindow.Output.Add("Player bumped Player!!!");
                 colliderA.Collided = true;
                 colliderB.Collided = true;
 
