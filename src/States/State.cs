@@ -13,13 +13,13 @@ namespace States
 
         protected GraphicsDevice graphicsDevice;
 
-        protected Game1 game;
+        protected MainGame game;
 
         #endregion
 
         #region Methods
 
-        public State(Game1 game, GraphicsDevice graphicsDevice, ContentManager content)
+        public State(MainGame game, GraphicsDevice graphicsDevice, ContentManager content)
         {
             this.game = game;
 

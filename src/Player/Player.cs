@@ -3,11 +3,18 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using States;
 
 namespace TankAttack
 {
     class Player : DrawableGameComponent, IGameObject, IMovableComponent
     {
+        
+        private MainGame _game;
+
+
+        public string PlayerName { get; set; }
         public bool IsReversing { get; set; }
         public bool IsAccelerating { get; set; }
         public bool CanRotate { get; set; }
@@ -24,6 +31,7 @@ namespace TankAttack
         public float Rotation { get; set; }
         public Vector2 BarrelTip { get; set; }
         public int Health { get; set; }
+
 
         // Collision
         public Rectangle CollisionBox
@@ -46,42 +54,43 @@ namespace TankAttack
         public float CurrentTime { get; set; }
         public float PreviousTime { get; set; }
 
-        protected WeaponSystem weaponSystem;
 
         public bool IsFiring { get; set; }
         public int FireCooldown { get; set; }
 
         public Dictionary<string, Texture2D> Textures { get; set; }
+        public Dictionary<string, SpriteFont> Fonts { get; set; }
         public Texture2D TankTurretTexture { get; protected set; }
         public Texture2D TankHullTexture { get; protected set; }
 
         // Player topHUD
         protected TopHUD topHud;
+        protected WeaponSystem weaponSystem;
 
         /* #region  constructor */
 
         public Player(
-            Game1 game, 
+            MainGame game, 
             Vector2 startPosition, 
             Dictionary<string, Texture2D> textures,
             Dictionary<string, SpriteFont> spriteFonts) 
             : base(game)
         {
+            _game = game;
             Position = startPosition;
             Speed = Position;
 
-            topHud = new TopHUD(game, spriteFonts);
-            topHud.NameText = this.GetType().Name;
-
+            Fonts = spriteFonts;
             Textures = textures;
 
             weaponSystem = new WeaponSystem(game, this);
-            Initialize();
+            //Initialize();
         }
         /* #endregion */
 
         public override void Initialize()
         {
+            topHud = new TopHUD(_game, Fonts);
             CanReverse = true;
             CanAccelerate = true;
             Rotation = 90;
@@ -166,21 +175,23 @@ namespace TankAttack
                 if (IsAccelerating)
                 {
                     CanAccelerate = false; 
-                    Game1.debugWindow.Output.Add($"{this.GetType().Name}Cant Accelerate!");
+                    MainGame.debugWindow.Output.Add($"{this.GetType().Name}Cant Accelerate!");
                 }
 
                 if (IsReversing) 
                 {
                     CanReverse = false; 
-                    Game1.debugWindow.Output.Add($"{this.GetType().Name}Cant Reverse!");
+                    MainGame.debugWindow.Output.Add($"{this.GetType().Name}Cant Reverse!");
                 }
             }
 
             if (GotHit) { Health -= 10; }
 
             if (Health <= 0) { IsDead = true; }
-            GotHit = false;
             
+            GotHit = false;
+
+            topHud.NameText = $"{PlayerName} | Health: {Health}";            
         }
 
         public void Accelerate()

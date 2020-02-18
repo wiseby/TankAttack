@@ -9,6 +9,8 @@ namespace States
 {
     public class GameState : State
     {
+        public string GreenPlayerName { get; set; }
+        public string BrownPlayerName { get; set; }
         private List<Player> players;
         private KeyboardState previousKbState;
         private Texture2D groundDessertTexture;
@@ -16,7 +18,7 @@ namespace States
         private Dictionary<string, Texture2D> textures;
         private Dictionary<string, SpriteFont> fonts;
 
-        private List<IGameObject> gameComponents = TankAttack.Game1.GameComponents;
+        private List<IGameObject> gameComponents = TankAttack.MainGame.GameComponents;
 
         // Collisions control
         private Collision collision;
@@ -24,7 +26,7 @@ namespace States
         private bool gameOver;
 
         public GameState(
-            Game1 game, 
+            MainGame game, 
             GraphicsDevice graphicsDevice, 
             ContentManager content,
             Dictionary<string, Texture2D> textures,
@@ -40,20 +42,25 @@ namespace States
         {
             players = new List<Player>();
 
-            AddPlayer(new GreenPlayer(
-                game, 
-                new Vector2(
-                    200, 
-                    Globals.ScreenHeight / 2), 
-                    textures, 
-                    fonts));
-            AddPlayer(new BrownPlayer(
-                game, 
-                new Vector2(
-                    Globals.ScreenWidth - 200, 
-                    Globals.ScreenHeight / 2), 
-                    textures, 
-                    fonts));
+            var greenPlayer = new GreenPlayer(
+                                game, 
+                                new Vector2(200, Globals.ScreenHeight / 2), 
+                                textures, 
+                                fonts);
+
+            var brownPlayer = new BrownPlayer(
+                                game, 
+                                new Vector2(Globals.ScreenWidth - 200, Globals.ScreenHeight / 2), 
+                                textures, 
+                                fonts);
+
+            greenPlayer.PlayerName = game.GreenPlayerName;
+            brownPlayer.PlayerName = game.BrownPlayerName;
+
+            AddPlayer(greenPlayer);
+            AddPlayer(brownPlayer);
+
+            
 
             collision = new Collision();
             groundDessertTexture = textures["Terrain/DessertTile"];
@@ -84,14 +91,21 @@ namespace States
             {
                 player.Interact(keyState);
                 player.Update(gameTime);
-                if (player.IsDead) { gameOver = true; }
+                if (player.IsDead) 
+                {  
+                    game.ChangeState(new GameOverState(game, graphicsDevice, content));
+                }
             }
+
+
+
             previousKbState = keyState;
 
             foreach (var component in gameComponents)
             {
                 component.Collided = false;
             }
+            
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -106,6 +120,7 @@ namespace States
                     spriteBatch.Draw(groundDessertTexture, new Vector2(j, i), Color.White);
                 }
             }
+            MainGame.debugWindow.Draw(spriteBatch);
             
             foreach (var player in players)
             {

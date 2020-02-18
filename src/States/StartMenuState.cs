@@ -17,6 +17,7 @@ namespace States
 
         private bool keyUpReleased = true;
         private bool keyDownReleased = true;
+        private bool allKeysReleased = true;
 
 
         public Vector2 MenuPosition = new Vector2(TankAttack.Globals.ScreenWidth / 2, 200);
@@ -32,7 +33,7 @@ namespace States
         public List<IMenuItem> MenuComponents { get; set; }
 
         public StartMenuState(
-            Game1 game,
+            MainGame game,
             GraphicsDevice graphicsDevice,
             ContentManager content,
             Dictionary<string, Texture2D> textures,
@@ -56,7 +57,8 @@ namespace States
             )
             {
                 Position = new Vector2(TankAttack.Globals.ScreenWidth / 2, 200),
-                Title = "GreenPlayer Name:"
+                Title = "GreenPlayer Name:",
+                InputText = "GreenPlayer"
             };
 
             // BrownPlayer Textbox
@@ -68,7 +70,8 @@ namespace States
             )
             {
                 Position = new Vector2(TankAttack.Globals.ScreenWidth / 2, 400),
-                Title = "BrownPlayer Name:"
+                Title = "BrownPlayer Name:",
+                InputText = "BrownPlayer"
             };
             // StartButton
             StartGameButton = new Button(
@@ -120,6 +123,9 @@ namespace States
         {
             var keyboardState = Keyboard.GetState();
 
+            if (keyboardState.GetPressedKeyCount() < 1) { allKeysReleased = true; }
+
+
             if (keyboardState.IsKeyDown(Keys.Escape))
                 { game.Exit(); }
 
@@ -147,25 +153,62 @@ namespace States
                 keyUpReleased = false;
             }
 
-            if (keyboardState.IsKeyDown(Keys.Enter))
+            switch (menuItemSelected)
             {
+                case MenuSelector.NameGreen:
+                    if(keyboardState.IsKeyDown(Keys.Back) && GreenPlayerInput.InputText.Length > 0 
+                        && allKeysReleased == true)
+                    {
+                        GreenPlayerInput.InputText = GreenPlayerInput.InputText.Remove(GreenPlayerInput.InputText.Length - 1, 1);
+                        allKeysReleased = false;
+                    }
+                    else if (allKeysReleased == true)
+                    {
+                        foreach (var key in keyboardState.GetPressedKeys())
+                        {
+                            if ((int)key > 64 && (int)key <  91)
+                            GreenPlayerInput.InputText += key.ToString();
+                            allKeysReleased = false;
+                        }
+                    }
+                    
+                    break;
 
-                switch (menuItemSelected)
-                {
-                    case MenuSelector.NameGreen:
-                        break;
+                case MenuSelector.NameBrown:
+                    if(keyboardState.IsKeyDown(Keys.Back) && BrownPlayerInput.InputText.Length > 0 
+                        && allKeysReleased == true)
+                    {
+                        BrownPlayerInput.InputText = BrownPlayerInput.InputText.Remove(BrownPlayerInput.InputText.Length - 1, 1);
+                        allKeysReleased = false;
+                    }
+                    else if (allKeysReleased == true)
+                    {
+                        foreach (var key in keyboardState.GetPressedKeys())
+                        {
+                            if ((int)key > 64 && (int)key <  91)
+                            BrownPlayerInput.InputText += key.ToString();
+                            allKeysReleased = false;
+                        }
+                    }
+                    break;
 
-                    case MenuSelector.NameBrown:
-                        break;
+                case MenuSelector.StarGame:
+                    if (keyboardState.IsKeyDown(Keys.Enter))
+                    {
+                        game.GreenPlayerName = GreenPlayerInput.InputText;
+                        game.BrownPlayerName = BrownPlayerInput.InputText;
+                        game.ChangeState(
+                            new GameState(game, graphicsDevice, content, _textures, _fonts));
+                    }
+                    break;
 
-                    case MenuSelector.StarGame:
-                        game.ChangeState(new GameState(game, graphicsDevice, content, _textures, _fonts));
-                        break;
-
-                    case MenuSelector.ExitGame:
+                case MenuSelector.ExitGame:
+                    if (keyboardState.IsKeyDown(Keys.Enter))
+                    {
                         game.Exit();
-                        break;
-                }
+                    }
+                    break;
+                
             }
             
         }

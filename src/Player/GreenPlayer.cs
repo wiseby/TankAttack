@@ -9,7 +9,7 @@ namespace TankAttack
     {
         bool spaceWasReleased = true;
         public GreenPlayer(
-            Game1 game, 
+            MainGame game, 
             Vector2 startPosition, 
             Dictionary<string, 
             Texture2D> textures,
@@ -23,8 +23,12 @@ namespace TankAttack
 
         public override void Initialize()
         {
-            topHud.Location = new Vector2(10, 10);
             base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            topHud.Location = new Vector2(20, 10);
         }
 
         public override void Interact(KeyboardState keyState)

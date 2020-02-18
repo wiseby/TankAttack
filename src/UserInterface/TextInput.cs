@@ -39,7 +39,7 @@ namespace UserInterface
             spriteBatch.DrawString(
                 inputFont,
                 InputText,
-                new Vector2(Position.X - 20, Position.Y - 40),
+                new Vector2(Position.X + 420, Position.Y + 20),
                 Color.Black
                 );
 

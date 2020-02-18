@@ -6,7 +6,7 @@ using States;
 
 namespace TankAttack
 {
-    public class Game1 : Game
+    public class MainGame : Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -19,6 +19,10 @@ namespace TankAttack
         private Dictionary<string, Texture2D> textures;
         private Dictionary<string, SpriteFont> fonts;
         public static List<IGameObject> GameComponents;
+
+        // Player Data
+        public string GreenPlayerName { get; set; }
+        public string BrownPlayerName { get; set; }
         
         string[] spriteAssets = new string[]
         {
@@ -53,7 +57,7 @@ namespace TankAttack
         // Debugging
         public static DebugWindow debugWindow;
 
-        public Game1()
+        public MainGame()
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferHeight = Globals.ScreenHeight;

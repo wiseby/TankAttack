@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 
 namespace TankAttack
@@ -55,14 +56,15 @@ namespace TankAttack
                 // If both colliders are projectiles, destroy them.
                 colliderA.GotHit = true;
                 colliderB.GotHit = true;
-                Game1.debugWindow.Output.Add("Projectile Collision!!!");
+                MainGame.debugWindow.Output.Add("Projectile Collision!!!");
 
             }
 
             if ((colliderA is Player && colliderB is Projectile) || (colliderA is Projectile && colliderB is Player))
             {
                 // If either one collider is projectiles and the other a player.
-                Game1.debugWindow.Output.Add("Player Hit!!!");
+                MainGame.debugWindow.Output.Add("Player Hit!!!");
+                Debug.WriteLine("Player Hit!");
                 
                 // Player GotHit = true
                 colliderA.GotHit = true;
@@ -72,7 +74,7 @@ namespace TankAttack
             if (colliderA is Player && colliderB is Player)
             {
                 // If either one collider is projectiles and the other a player.
-                Game1.debugWindow.Output.Add("Player bumped Player!!!");
+                MainGame.debugWindow.Output.Add("Player bumped Player!!!");
                 colliderA.Collided = true;
                 colliderB.Collided = true;
 
