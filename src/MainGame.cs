@@ -23,6 +23,9 @@ namespace TankAttack
         // Player Data
         public string GreenPlayerName { get; set; }
         public string BrownPlayerName { get; set; }
+        public int GreenPlayerScore { get; set; }
+        public int BrownPlayerScore { get; set; }
+        public int SecondsPlayed { get; set; }
         
         string[] spriteAssets = new string[]
         {
@@ -51,7 +54,8 @@ namespace TankAttack
             "SpriteFonts/GreenPlayerInput",
             "SpriteFonts/BrownPlayerInput",
             "SpriteFonts/GreenPlayerTextBoxTitle",
-            "SpriteFonts/BrownPlayerTextBoxTitle"
+            "SpriteFonts/BrownPlayerTextBoxTitle",
+            "SpriteFonts/WinnerText"
         };
 
         // Debugging

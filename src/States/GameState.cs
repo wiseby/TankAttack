@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -11,6 +12,8 @@ namespace States
     {
         public string GreenPlayerName { get; set; }
         public string BrownPlayerName { get; set; }
+        public TimeSpan GameStartTime { get; set; }
+        public TimeSpan GameOverTime { get; set; }
         private List<Player> players;
         private KeyboardState previousKbState;
         private Texture2D groundDessertTexture;
@@ -30,12 +33,14 @@ namespace States
             GraphicsDevice graphicsDevice, 
             ContentManager content,
             Dictionary<string, Texture2D> textures,
-            Dictionary<string, SpriteFont> fonts) 
+            Dictionary<string, SpriteFont> fonts,
+            GameTime gameTime) 
             : base(game, graphicsDevice, content)
         {
             this.textures = textures;
             this.fonts = fonts;
             Initialize();
+            GameStartTime = gameTime.TotalGameTime;
         }
 
         private void Initialize()
@@ -76,7 +81,6 @@ namespace States
 
         public override void PostUpdate(GameTime gameTime)
         {
-            throw new System.NotImplementedException();
         }
 
         public override void Update(GameTime gameTime)
@@ -93,17 +97,30 @@ namespace States
                 player.Update(gameTime);
                 if (player.IsDead) 
                 {  
-                    game.ChangeState(new GameOverState(game, graphicsDevice, content));
+                    gameOver = true;
+                    
                 }
             }
-
-
-
+                
             previousKbState = keyState;
 
             foreach (var component in gameComponents)
             {
                 component.Collided = false;
+            }
+
+            if (gameOver)
+            {
+                foreach (var player in players)
+                {
+                    if (player is GreenPlayer)
+                            { game.GreenPlayerScore = player.Health; }
+
+                    if (player is BrownPlayer)
+                        { game.BrownPlayerScore = player.Health; }    
+                }
+                game.SecondsPlayed = gameTime.TotalGameTime.Subtract(GameStartTime).Seconds;
+                game.ChangeState(new GameOverState(game, graphicsDevice, content, textures, fonts));
             }
             
         }

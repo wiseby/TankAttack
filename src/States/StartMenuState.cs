@@ -198,7 +198,7 @@ namespace States
                         game.GreenPlayerName = GreenPlayerInput.InputText;
                         game.BrownPlayerName = BrownPlayerInput.InputText;
                         game.ChangeState(
-                            new GameState(game, graphicsDevice, content, _textures, _fonts));
+                            new GameState(game, graphicsDevice, content, _textures, _fonts, gameTime));
                     }
                     break;
 
