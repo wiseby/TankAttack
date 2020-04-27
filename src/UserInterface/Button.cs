@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -7,8 +8,20 @@ namespace UserInterface
     {        
         private Texture2D texture;
         private SpriteFont font;
-
+        public bool IsActive { get; set; }
+        public string InputText { 
+            get 
+            {
+                // Logging
+                throw new NotImplementedException();
+            }
+            set 
+            {
+                throw new NotImplementedException();
+            }
+        } 
         public string Title { get; set; }
+        public string MenuMarker { get; set; } = " ++ ";
         public Vector2 Position { get; set; }
 
         public Button(Game game, Texture2D texture, SpriteFont font) 
@@ -18,27 +31,35 @@ namespace UserInterface
             this.font = font;
         }
 
+        public void Activate()
+        {
+            IsActive = true;
+        }
+
+        public void Deactivate()
+        {
+            IsActive = false;
+        }
+
         public void Update()
         {
-            
+        }
+
+        private string RenderTitle()
+        {
+            var renderedTitle = Title;
+            if(IsActive)
+            {
+                renderedTitle = $"{MenuMarker}{Title}{MenuMarker}";
+            }
+            return renderedTitle;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            // spriteBatch.Draw(
-            //     texture,
-            //     Position,
-            //     null,
-            //     Color.White,
-            //     0.0f,
-            //     default,
-            //     4.0f,
-            //     SpriteEffects.None,
-            //     0.0f
-            // );
             spriteBatch.DrawString(
                 font,
-                Title,
+                RenderTitle(),
                 Position,
                 Color.Black,
                 0.0f,
