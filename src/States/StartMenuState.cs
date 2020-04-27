@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,7 +10,7 @@ using UserInterface;
 namespace States
 {
 
-    public enum MenuSelector { NameGreen = 0, NameBrown, StarGame, ExitGame }
+    public enum MenuSelector { NameGreen = 0, NameBrown, StartGame, ExitGame }
 
     public class StartMenuState : State
     {
@@ -24,13 +25,8 @@ namespace States
 
         private Dictionary<string, Texture2D> _textures;
         private Dictionary<string, SpriteFont> _fonts;
-
-
-        public TextInput GreenPlayerInput { get; set; }
-        public TextInput BrownPlayerInput { get; set; }
-        public Button StartGameButton { get; set; }
-        public Button ExitButton { get; set; }
         public List<IMenuItem> MenuComponents { get; set; }
+        private readonly int[] inputChars = { 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90 };
 
         public StartMenuState(
             MainGame game,
@@ -48,8 +44,10 @@ namespace States
 
         public void Initialize()
         {
+            MenuComponents = new List<IMenuItem>();
             // GreenPlayer Textbox
-            GreenPlayerInput = new TextInput(
+            MenuComponents.Add(
+                new TextInput(
                 game,
                 _textures["UI/TextBox"],
                 _fonts["SpriteFonts/GreenPlayerInput"],
@@ -59,59 +57,56 @@ namespace States
                 Position = new Vector2(TankAttack.Globals.ScreenWidth / 2, 200),
                 Title = "GreenPlayer Name:",
                 InputText = "GreenPlayer"
-            };
+            });
 
             // BrownPlayer Textbox
-            BrownPlayerInput = new TextInput(
+            MenuComponents.Add(
+                new TextInput(
                 game,
                 _textures["UI/TextBox"],
                 _fonts["SpriteFonts/BrownPlayerInput"],
                 _fonts["SpriteFonts/BrownPlayerTextBoxTitle"]
             )
-            {
-                Position = new Vector2(TankAttack.Globals.ScreenWidth / 2, 400),
-                Title = "BrownPlayer Name:",
-                InputText = "BrownPlayer"
-            };
+                {
+                    Position = new Vector2(TankAttack.Globals.ScreenWidth / 2, 400),
+                    Title = "BrownPlayer Name:",
+                    InputText = "BrownPlayer"
+                });
+
             // StartButton
-            StartGameButton = new Button(
+            MenuComponents.Add(
+                new Button(
                 game,
                 _textures["UI/GreenBtn"],
                 _fonts["SpriteFonts/StartBtnText"])
-            {
-                Position = new Vector2(TankAttack.Globals.ScreenWidth / 2, 600),
-                Title = "Start Game"
-            };
+                {
+                    Position = new Vector2(TankAttack.Globals.ScreenWidth / 2, 600),
+                    Title = "Start Game"
+                });
 
             // ExitButton
-            ExitButton = new Button(
+            MenuComponents.Add(
+                new Button(
                 game,
                 _textures["UI/GreenBtn"],
                 _fonts["SpriteFonts/ExitBtnText"])
             {
                 Position = new Vector2(TankAttack.Globals.ScreenWidth / 2, 800),
                 Title = "Exit Game"
-            };
-
-            MenuComponents = new List<IMenuItem>() {
-                GreenPlayerInput,
-                BrownPlayerInput,
-                StartGameButton,
-                ExitButton
-            };
+            });
 
             menuItemSelected = 0;
-            MarkMenuItem();
+            MenuComponents[0].Activate();
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             spriteBatch.Begin();
             graphicsDevice.Clear(Color.BurlyWood);
-            GreenPlayerInput.Draw(gameTime, spriteBatch);
-            BrownPlayerInput.Draw(gameTime, spriteBatch);
-            StartGameButton.Draw(gameTime, spriteBatch);
-            ExitButton.Draw(gameTime, spriteBatch);
+            foreach (var item in MenuComponents)
+            {
+                item.Draw(gameTime, spriteBatch);
+            }
             spriteBatch.End();
         }
 
@@ -127,16 +122,16 @@ namespace States
 
 
             if (keyboardState.IsKeyDown(Keys.Escape))
-                { game.Exit(); }
+            { game.Exit(); }
 
             if (keyboardState.IsKeyUp(Keys.Down)) { keyDownReleased = true; }
             if (keyboardState.IsKeyDown(Keys.Down) && keyDownReleased == true)
             {
                 if (menuItemSelected < MenuSelector.ExitGame)
                 {
-                    UnMarkMenuItem();
+                    MenuComponents[(int)menuItemSelected].Deactivate();
                     menuItemSelected++;
-                    MarkMenuItem();
+                    MenuComponents[(int)menuItemSelected].Activate();
                 }
                 keyDownReleased = false;
             }
@@ -146,57 +141,59 @@ namespace States
             {
                 if (menuItemSelected > MenuSelector.NameGreen)
                 {
-                    UnMarkMenuItem();
+                    MenuComponents[(int)menuItemSelected].Deactivate();
                     menuItemSelected--;
-                    MarkMenuItem();
+                    MenuComponents[(int)menuItemSelected].Activate();
                 }
                 keyUpReleased = false;
             }
 
+            var selectedItem = MenuComponents[(int)menuItemSelected];
+
             switch (menuItemSelected)
             {
                 case MenuSelector.NameGreen:
-                    if(keyboardState.IsKeyDown(Keys.Back) && GreenPlayerInput.InputText.Length > 0 
+                    if (keyboardState.IsKeyDown(Keys.Back) && selectedItem.InputText.Length > 0
                         && allKeysReleased == true)
                     {
-                        GreenPlayerInput.InputText = GreenPlayerInput.InputText.Remove(GreenPlayerInput.InputText.Length - 1, 1);
+                        selectedItem.InputText = selectedItem.InputText.Remove(selectedItem.InputText.Length - 1, 1);
                         allKeysReleased = false;
                     }
                     else if (allKeysReleased == true)
                     {
                         foreach (var key in keyboardState.GetPressedKeys())
                         {
-                            if ((int)key > 64 && (int)key <  91)
-                            GreenPlayerInput.InputText += key.ToString();
+                            if ((int)key > 64 && (int)key < 91)
+                                selectedItem.InputText += key.ToString();
                             allKeysReleased = false;
                         }
                     }
-                    
+
                     break;
 
                 case MenuSelector.NameBrown:
-                    if(keyboardState.IsKeyDown(Keys.Back) && BrownPlayerInput.InputText.Length > 0 
+                    if (keyboardState.IsKeyDown(Keys.Back) && selectedItem.InputText.Length > 0
                         && allKeysReleased == true)
                     {
-                        BrownPlayerInput.InputText = BrownPlayerInput.InputText.Remove(BrownPlayerInput.InputText.Length - 1, 1);
+                        selectedItem.InputText = selectedItem.InputText.Remove(selectedItem.InputText.Length - 1, 1);
                         allKeysReleased = false;
                     }
                     else if (allKeysReleased == true)
                     {
                         foreach (var key in keyboardState.GetPressedKeys())
                         {
-                            if ((int)key > 64 && (int)key <  91)
-                            BrownPlayerInput.InputText += key.ToString();
+                            if ((int)key > 64 && (int)key < 91)
+                                selectedItem.InputText += key.ToString();
                             allKeysReleased = false;
                         }
                     }
                     break;
 
-                case MenuSelector.StarGame:
+                case MenuSelector.StartGame:
                     if (keyboardState.IsKeyDown(Keys.Enter))
                     {
-                        game.GreenPlayerName = GreenPlayerInput.InputText;
-                        game.BrownPlayerName = BrownPlayerInput.InputText;
+                        game.GreenPlayerName = MenuComponents[0].InputText;
+                        game.BrownPlayerName = MenuComponents[1].InputText;
                         game.ChangeState(
                             new GameState(game, graphicsDevice, content, _textures, _fonts, gameTime));
                     }
@@ -208,14 +205,9 @@ namespace States
                         game.Exit();
                     }
                     break;
-                
-            }
-            
-        }
 
-        private void MarkMenuItem()
-        {
-            MenuComponents[(int)menuItemSelected].Title = MenuComponents[(int)menuItemSelected].Title.Insert(0, "-- ");
+            }
+
         }
 
         private void UnMarkMenuItem()

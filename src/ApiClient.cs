@@ -47,9 +47,16 @@ namespace WebApiClient
             var jsonString = JsonConvert.SerializeObject(score);
             StringContent content = new StringContent(jsonString, Encoding.UTF8, "application/json");
 
-            var response = await client.PostAsync("Highscore", content);
-            string result = response.Content.ReadAsStringAsync().Result;
-            Debug.WriteLine(result);
+            try 
+            {
+                var response = await client.PostAsync("Highscore", content);
+                string result = response.Content.ReadAsStringAsync().Result;
+                Debug.WriteLine(result);
+            }
+            catch(Exception)
+            {
+                Console.WriteLine("Failed to connect to API");
+            }
         }
     }
 }
